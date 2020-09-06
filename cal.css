@@ -6,6 +6,18 @@
     letter-spacing: 5px;
     font-size: 1.5rem;
   }
+
+  #remove{
+    display: inline-block;
+    border: 1px solid #bbb;
+    border-radius: 1px;
+    width: 210px;
+    text-align: center;
+    padding: 10px;
+    margin: 20px 4px 10px 0;
+    cursor: pointer;
+    background-color: #ddd;
+  }
   
   .calculator {
     padding: 20px;
