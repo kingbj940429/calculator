@@ -25,13 +25,7 @@ for (var i = 0; i < number.length; i++) {
            
         }
         resultString += e.target.textContent;
-       // $('#note').append(e.target.textContent); //메모
-
-       $('#remove').on('click',(e)=>{
-        alert('삭제');
-        currentString += currentString.substring(0,currentString[currentString.length - 1] );
-    })
-      
+       // $('#note').append(e.target.textContent); //메모   
     });
 }
 
@@ -48,7 +42,7 @@ for (var i = 0; i < operator.length; i++) {
             var newString = currentString.substring(0, currentString.length - 1) + e.target.textContent;
             //새로 입력되는 사칙연산 전까지의 string에 새롭게 입력되는 문자를 다시 입력한다.
             input.textContent = newString;
-            note.textContent = newString;//메모장도 사칙부호가 바뀌면 내용이 바뀐다.
+           // note.textContent = newString;//메모장도 사칙부호가 바뀌면 내용이 바뀐다.
             
            
         } else if (currentString.length == 0) {
@@ -57,11 +51,6 @@ for (var i = 0; i < operator.length; i++) {
             input.textContent += e.target.textContent;
            // $('#note').append(e.target.textContent); //메모
         }
-        $('#remove').on('click',(e)=>{
-            alert('삭제');
-        });
-        
-       
     });
 }
 
@@ -69,8 +58,9 @@ for (var i = 0; i < operator.length; i++) {
 $('#result').on('click', () => {
     var inputString = input.textContent; //입력된 숫자 가져오기
     var numbers = inputString.split(/\+|\-|\×|\÷/g); //정규식 사칙부호 제거
+    //+,-,x,÷ 를 정규식으로 찾아서 전역검색을 하여 해당 있는 부분을 다 잘라서 배열에 저장
     var operators = inputString.replace(/[0-9]|\./g, "").split(""); //0~9 과 소수점을 공백으로 하고 분리
-
+    //0~9와 . 을 다 공백으로 replace하고 그걸 다시 한글자씩 split 한다.
     console.log(inputString);
     console.log(numbers);
     console.log(operators);
@@ -81,7 +71,7 @@ $('#result').on('click', () => {
         operators.splice(divide, 1);
         divide = operators.indexOf("÷");
     }
-
+    //3x3x3x3
     var multiply = operators.indexOf("×");
     while (multiply != -1) {
         numbers.splice(multiply, 2, numbers[multiply] * numbers[multiply + 1]);
@@ -115,7 +105,18 @@ $('#result').on('click', () => {
 })
 
 //삭제시
+$('#remove').on('click', ()=>{
+    var currentString = input.textContent;
+    console.log('삭제' + currentString);
 
+    currentString=currentString.substring(0,currentString.length-1);
+    input.textContent = currentString;
+});
+
+//메모 초기화
+$('#remove_memo').on('click',()=>{
+    $('#note').text('');
+});
 
 
 //clear 클릭시
