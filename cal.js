@@ -3,14 +3,12 @@ var operator = $('.operators div');
 var input = document.getElementById('input');
 var resultDisplayed = false;
 var note = document.getElementById('note');
-var resultString;
+
 //숫자키 클릭시
 for (var i = 0; i < number.length; i++) {
     number[i].addEventListener("click", (e) => {
-        console.log(e.target.textContent);
-
         var currentString = input.textContent;
-        var lastChar = currentString[currentString.length - 1]; //
+        var lastChar = currentString[currentString.length - 1]; 
 
         if (resultDisplayed === false) {
             $('#input').append(e.target.textContent); //숫자 입력시 input에 보여줌
@@ -22,38 +20,27 @@ for (var i = 0; i < number.length; i++) {
             resultDisplayed = false;
             input.innerHTML = "";
             input.innerHTML += e.target.innerHTML;
-           
         }
-        resultString += e.target.textContent;
-       // $('#note').append(e.target.textContent); //메모   
     });
 }
 
 //사칙부호 클릭시
 for (var i = 0; i < operator.length; i++) {
     operator[i].addEventListener("click", (e) => {
-        console.log(e.target.textContent);
-        //$('#input').append(e.target.textContent); //사칙부호 입력시 input에 보여줌
         var currentString = input.textContent;
         var lastChar = currentString[currentString.length - 1];
 
-      
         if (lastChar === "+" || lastChar === "-" || lastChar === "×" || lastChar === "÷") {
             var newString = currentString.substring(0, currentString.length - 1) + e.target.textContent;
             //새로 입력되는 사칙연산 전까지의 string에 새롭게 입력되는 문자를 다시 입력한다.
             input.textContent = newString;
-           // note.textContent = newString;//메모장도 사칙부호가 바뀌면 내용이 바뀐다.
-            
-           
         } else if (currentString.length == 0) {
             alert('숫자 먼저 입력해주세요');
         } else {
             input.textContent += e.target.textContent;
-           // $('#note').append(e.target.textContent); //메모
         }
     });
 }
-
 //= 클릭시
 $('#result').on('click', () => {
     var inputString = input.textContent; //입력된 숫자 가져오기
@@ -61,9 +48,9 @@ $('#result').on('click', () => {
     //+,-,x,÷ 를 정규식으로 찾아서 전역검색을 하여 해당 있는 부분을 다 잘라서 배열에 저장
     var operators = inputString.replace(/[0-9]|\./g, "").split(""); //0~9 과 소수점을 공백으로 하고 분리
     //0~9와 . 을 다 공백으로 replace하고 그걸 다시 한글자씩 split 한다.
-    console.log(inputString);
-    console.log(numbers);
-    console.log(operators);
+    console.log('inputString : ' , inputString);
+    console.log('numbers : ' , numbers);
+    console.log('operators : ' , operators);
 
     var divide = operators.indexOf("÷");
     while (divide != -1) {
@@ -99,7 +86,6 @@ $('#result').on('click', () => {
     $('#note').append(inputString +' = <strong>' + numbers[0] + '</strong><br>');
     if(inputString.length ==0){
         alert('숫자를 입력해주세요');
-        //$('#note').text('');
     }
     resultDisplayed = true;
 })
@@ -107,7 +93,6 @@ $('#result').on('click', () => {
 //삭제시
 $('#remove').on('click', ()=>{
     var currentString = input.textContent;
-    console.log('삭제' + currentString);
 
     currentString=currentString.substring(0,currentString.length-1);
     input.textContent = currentString;
@@ -117,7 +102,6 @@ $('#remove').on('click', ()=>{
 $('#remove_memo').on('click',()=>{
     $('#note').text('');
 });
-
 
 //clear 클릭시
 $('#clear').on('click', () => {
