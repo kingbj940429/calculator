@@ -1,3 +1,5 @@
+//history 하나하나 배열에 저장하는거 못함.
+
 var Calculator = function(){
 
     this.inputBtns;
@@ -31,6 +33,7 @@ var Calculator = function(){
         this.registResultEvent();//equal 눌렀을 때
         this.registRemoveEachEvent();// Backspace 눌렀을 때
         this.clearDisplayPanel();//Clear 눌렀을 떄
+        this.removeEvent();//메모 Clear 눌렀을 때
         
     }
 
@@ -70,16 +73,20 @@ var Calculator = function(){
     this.registOperatorEvent = () => {
         $('.operators').each((index)=>{
            this.operationBtns[index].addEventListener("click", (e) => {
-                this.currentString = this.displayPanel.text();
-                this.lastChar = this.currentString[this.currentString.length - 1];
-        
-                if (this.lastChar === "+" || this.lastChar === "-" || this.lastChar === "×" || this.lastChar === "÷") {
-                    this.ifOperatorChanged(e);
-                } else if (this.currentString.length == 0) {
-                    this.inputNumberBeforeOperator();
-                } else {
-                    input.textContent += e.target.textContent;//여기 함수화 시켜야함
-                }
+               try {
+                    this.currentString = this.displayPanel.text();
+                    this.lastChar = this.currentString[this.currentString.length - 1];
+            
+                    if (this.lastChar === "+" || this.lastChar === "-" || this.lastChar === "×" || this.lastChar === "÷") {
+                        this.ifOperatorChanged(e);
+                    } else if (this.currentString.length == 0) {
+                        this.inputNumberBeforeOperator();
+                    } else {
+                        this.doInputOperator(e);
+                    }
+               } catch (error) {
+                   console.log(error);
+               }
             });
         });
     }
@@ -94,14 +101,15 @@ var Calculator = function(){
     this.inputNumberBeforeOperator = ()=>{
         alert('숫자 먼저 입력해주세요');
     }
+    this.doInputOperator = (e) =>{
+        this.displayPanel.append(e.target.textContent);
+    }
     //= 눌렀을 때
     this.registResultEvent = (e)=>{
         this.resultBtn.on('click', () => {
             var inputString = this.displayPanel.text(); //입력된 숫자 가져오기
             var numbers = inputString.split(/\+|\-|\×|\÷/g); //정규식 사칙부호 제거
-            //+,-,x,÷ 를 정규식으로 찾아서 전역검색을 하여 해당 있는 부분을 다 잘라서 배열에 저장
             var operators = inputString.replace(/[0-9]|\./g, "").split(""); //0~9 과 소수점을 공백으로 하고 분리
-            //0~9와 . 을 다 공백으로 replace하고 그걸 다시 한글자씩 split 한다.
         
             console.log('inputString : ' , inputString);
             console.log('numbers : ' , numbers);
@@ -114,8 +122,8 @@ var Calculator = function(){
             this.add(numbers, operators);
            
             this.displayPanel.text(numbers[0]);
-            this.calculateHistory.push(numbers[0]);//결과값을 하나씩 넣는다.
-            console.log("결과값 히스토리 : ",this.calculateHistory);
+            //this.calculateHistory.push(numbers[0]);//결과값을 하나씩 넣는다.
+            //console.log("결과값 히스토리 : ",this.calculateHistory);
             this.resultDisplayed = true;
             //결과값을 메모 에 넘겨주는 곳 숫자들 사칙부호들 결과값이 arguments
             this.addHistory(numbers, operators, numbers[0], inputString);
@@ -175,7 +183,7 @@ var Calculator = function(){
     }
     this.clearPanel = () =>{
         this.displayPanel.empty();
-        this.calculateHistory.length = 0;
+        //this.calculateHistory.length = 0;
     }
     
     this.addHistory = function( numbers, operators, result, inputString ){
@@ -183,9 +191,20 @@ var Calculator = function(){
             numbers, operators, result, inputString
         );
         console.log("historyObj : ", historyObj.inputString);
-
+        
+        this.calculateHistory.push( historyObj );
         this.memoPanel.append( historyObj.toString() +"<br>" );
-        historyObj.removeEvent();
+        //historyObj.removeEvent();
+    }
+    this.removeEvent = () =>{
+        $("#remove_memo").on("click",()=>{
+            this.destroy();
+        });
+    }
+    this.destroy = ()=>{
+        var i, len = this.calculateHistory.length;
+        this.calculateHistory.length = 0;
+        $("#note").text("");
     }
 
     
@@ -207,16 +226,16 @@ var CalculatorHistory = function(numbers, operators, result, inputString){
         return this.resultString;
     }
 
-    this.removeEvent = () =>{
-        $("#remove_memo").on("click",()=>{
-            this.destroy();
-        });
-    }
+    // this.removeEvent = () =>{
+    //     $("#remove_memo").on("click",()=>{
+    //         this.destroy();
+    //     });
+    // }
 
-    this.destroy = ()=>{
-        $("#note").text("");
+    // this.destroy = ()=>{
+    //     $("#note").text("");
         
-    }
+    // }
 
 }
 
