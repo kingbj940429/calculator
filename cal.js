@@ -35,12 +35,13 @@ for (var i = 0; i < operator.length; i++) {
             //새로 입력되는 사칙연산 전까지의 string에 새롭게 입력되는 문자를 다시 입력한다.
             input.textContent = newString;
         } else if (currentString.length == 0) {
-            alert('숫자 먼저 입력해주세요');
+            alert('숫자를 입력해주세요');
         } else {
             input.textContent += e.target.textContent;
         }
     });
 }
+
 //= 클릭시
 $('#result').on('click', () => {
     var inputString = input.textContent; //입력된 숫자 가져오기
