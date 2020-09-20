@@ -28,32 +28,45 @@ var Calculator = function(){
         this.displayPanel = $('#input');
         this.memoPanel = $('#note');
         
-        this.registNumberEvent();//숫자 눌렀을 때
-        this.registOperatorEvent();//사칙부호 눌렀을 때
-        this.registResultEvent();//equal 눌렀을 때
+
+        this.showClickNumbers();//마우스로 숫자 눌렀을 때
+        this.showClickOperators();//마우스로 사칙부호 눌렀을 때
+        this.showClickReult();//마우스로 = 클릭 했을 때 이벤트
         this.registRemoveEachEvent();// Backspace 눌렀을 때
         this.clearDisplayPanel();//Clear 눌렀을 떄
         this.removeEvent();//메모 Clear 눌렀을 때
+
+        //키 이벤트 관련 함수
+        this.toKnowKeyCode();
+        this.pressNumKey();
+        this.pressOpeKey();
+        this.pressRestKey();
         
     }
 
-    //숫자키 입력했을 때
-    this.registNumberEvent = () => {
-            $('.leftPanel .numbers div').not("#clear").each((index)=>{
-                this.inputBtns[index].addEventListener("click", (e) => {
-                    this.currentString = this.displayPanel.text();
-                    this.lastChar = this.currentString[this.currentString.length - 1];
-                    if (this.resultDisplayed === false) {
-                        this.insertValueToDisplay(e);
-                    } else if (this.resultDisplayed === true && this.lastChar === "+" || this.lastChar === "-" || this.lastChar === "×" || this.lastChar === "÷") {
-                        //equl로 답을 구하고 바로 사칙부호를 넣어서 계속해서 계산할 수 있게 해줌.
-                        this.calculateValueRightAway(e);
-                    } else {
-                        this.afterOneCalculatrion(e);
-                    }
-                });
-            });
+
+    //숫자를 입력해주는 함수
+    this.registNumberEvent = (e) => {
+        this.currentString = this.displayPanel.text();
+        this.lastChar = this.currentString[this.currentString.length - 1];
+        if (this.resultDisplayed === false) {
+            this.insertValueToDisplay(e);
+        } else if (this.resultDisplayed === true && this.lastChar === "+" || this.lastChar === "-" || this.lastChar === "×" || this.lastChar === "÷") {
+            //equl로 답을 구하고 바로 사칙부호를 넣어서 계속해서 계산할 수 있게 해줌.
+            this.calculateValueRightAway(e);
+        } else {
+            this.afterOneCalculatrion(e);
+        }
     }
+
+    this.showClickNumbers = ()=>{
+        $('.leftPanel .numbers div').not("#clear").each((index)=>{
+            this.inputBtns[index].addEventListener("click", (e) => {
+                this.registNumberEvent(e);
+            });
+        });
+    }
+
     //숫자를 화면에 나타내기 위한 함수
     this.insertValueToDisplay = (e) => {
        this.displayPanel.append(e.target.textContent); //숫자 입력시 input에 보여줌
@@ -70,25 +83,75 @@ var Calculator = function(){
         this.displayPanel.append(e.target.textContent);
     }
     //사칙 부호 입력했을 때
-    this.registOperatorEvent = () => {
+    this.registOperatorEvent = (e) => {
+        try {
+            this.currentString = this.displayPanel.text();
+            this.lastChar = this.currentString[this.currentString.length - 1];
+
+            if (this.lastChar === "+" || this.lastChar === "-" || this.lastChar === "×" || this.lastChar === "÷") {
+                this.ifOperatorChanged(e);
+            } else if (this.currentString.length == 0) {
+                this.inputNumberBeforeOperator();
+            } else {
+                this.doInputOperator(e);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    this.pressOpeKey = () =>{
+        this.isShift;
+        $(document).keyup((e)=>{
+            if(e.which === 16){
+                this.isShift = false;
+                console.log(this.isShift);
+            }
+        })
+        $(document).keydown((e) => {
+            var charCode = e.which;
+        
+            this.currentString = this.displayPanel.text();
+            this.lastChar = this.currentString[this.currentString.length - 1];
+
+            if(charCode === 16){
+                this.isShift = true;
+                console.log(this.isShift);
+            }
+
+            //사칙부호
+            if (charCode === 191 || charCode === 111) {
+                this.KeyOperatorChanged('÷');
+            }else if ((charCode === 56 && this.isShift === true) || charCode === 106) {
+                this.KeyOperatorChanged('×');
+            }else if((charCode === 187 && e.shiftKey) || charCode === 107){
+                this.KeyOperatorChanged('+');
+            }else if(charCode === 189 || charCode === 109){
+                this.KeyOperatorChanged('-');
+            }
+
+          });
+    }
+    this.KeyOperatorChanged = (char) => {
+        if (this.lastChar === "+" || this.lastChar === "-" || this.lastChar === "×" || this.lastChar === "÷") {
+            console.log("LastChar : " + this.lastChar);
+            var newString = this.currentString.substring(0, this.currentString.length - 1) + char;
+            //새로 입력되는 사칙연산 전까지의 string에 새롭게 입력되는 문자를 다시 입력한다.
+            console.log('newString : ' + newString);
+            this.displayPanel.text(newString);   
+        }else if (this.currentString.length == 0) {
+            this.inputNumberBeforeOperator();
+        }else {
+            this.doInputKeyOperator(char);
+        }
+    }
+
+    this.showClickOperators = () =>{
         $('.operators').each((index)=>{
-           this.operationBtns[index].addEventListener("click", (e) => {
-               try {
-                    this.currentString = this.displayPanel.text();
-                    this.lastChar = this.currentString[this.currentString.length - 1];
-            
-                    if (this.lastChar === "+" || this.lastChar === "-" || this.lastChar === "×" || this.lastChar === "÷") {
-                        this.ifOperatorChanged(e);
-                    } else if (this.currentString.length == 0) {
-                        this.inputNumberBeforeOperator();
-                    } else {
-                        this.doInputOperator(e);
-                    }
-               } catch (error) {
-                   console.log(error);
-               }
-            });
-        });
+            this.operationBtns[index].addEventListener("click", (e) => {
+                this.registOperatorEvent(e);
+             });
+         });
     }
     //만약 사칙부호를 클릭하고 이어서 사칙부호 클릭시 (여기 버그 있음)
     this.ifOperatorChanged = (e) => {
@@ -104,9 +167,11 @@ var Calculator = function(){
     this.doInputOperator = (e) =>{
         this.displayPanel.append(e.target.textContent);
     }
-    //= 눌렀을 때
+    this.doInputKeyOperator = (char) =>{
+        this.displayPanel.append(char);
+    }
+    // = 를 직접 누르거나 key 이벤트로 엔터를 눌렀을때 실행되는 함수
     this.registResultEvent = (e)=>{
-        this.resultBtn.on('click', () => {
             var inputString = this.displayPanel.text(); //입력된 숫자 가져오기
             var numbers = inputString.split(/\+|\-|\×|\÷/g); //정규식 사칙부호 제거
             var operators = inputString.replace(/[0-9]|\./g, "").split(""); //0~9 과 소수점을 공백으로 하고 분리
@@ -127,7 +192,11 @@ var Calculator = function(){
             this.resultDisplayed = true;
             //결과값을 메모 에 넘겨주는 곳 숫자들 사칙부호들 결과값이 arguments
             this.addHistory(numbers, operators, numbers[0], inputString);
-        })
+    }
+    this.showClickReult = ()=>{
+        this.resultBtn.on("click", ()=>{
+            this.registResultEvent();
+        });
     }
     this.divide = (numbers, operators) =>{
         var divide = operators.indexOf("÷");
@@ -206,8 +275,61 @@ var Calculator = function(){
         this.calculateHistory.length = 0;
         $("#note").text("");
     }
-
     
+    //############################## 키 이벤트 관련
+    this.toKnowKeyCode = () =>{
+        $(document).keydown((e)=>{
+            console.log(e.which);//keyCode 알아내기 위함.
+        })
+    }
+
+    this.pressNumKey = () =>{
+        $(document).keydown((e) => {
+            var charIndex = 96;
+            var charIndex02 = 48;
+            var charCode = e.which;
+
+            // 숫자키
+            for(i=0;i<10;i++){
+                if(charCode === charIndex + i || charCode === charIndex02 + i){
+                    if(charCode === 56 || this.isShift === true){
+
+                    }else{
+                        this.showNumtoDisplay(e);
+                    }
+                }
+            }
+          });
+    }
+    this.pressRestKey = () =>{
+        $(document).keydown((e) => {
+            var charCode = e.which;
+
+            // backspace
+            if ( charCode === 8 ) {
+                this.removeEachKey();
+            }
+            // enter 즉, = 키 눌렀을 때로 간주
+            if( charCode === 13){
+                this.showResult();//키보드로 엔터 눌렀을 때
+            }
+         
+          });
+    }
+    
+    this.removeEachKey = () =>{
+        this.currentString = this.displayPanel.text();
+        
+        this.currentString= this.currentString.substring(0,this.currentString.length-1);
+        this.displayPanel.text(this.currentString);
+    }
+    this.showNumtoDisplay = (e) =>{
+        this.displayPanel.append(i);
+    }
+    this.showResult = () =>{
+        this.registResultEvent();
+    }
+
 }
 var CalculatorHistory = function(numbers, operators, result, inputString){
     this.numbers = numbers;//왜 값들이 제대로 넘어오지 않는걸까..??
@@ -225,18 +347,6 @@ var CalculatorHistory = function(numbers, operators, result, inputString){
         }
         return this.resultString;
     }
-
-    // this.removeEvent = () =>{
-    //     $("#remove_memo").on("click",()=>{
-    //         this.destroy();
-    //     });
-    // }
-
-    // this.destroy = ()=>{
-    //     $("#note").text("");
-        
-    // }
-
 }
 
 $(()=>{
